@@ -95,6 +95,7 @@ public class RickController : MonoBehaviour
         #region Calling Jump Method
         if ((Input.GetButton("Jump") || Input.touches.Length > 0) && _groundCheck == true)
         {
+            _anim.SetBool("isjumping", true);
             DoJump();
         }
         #endregion
@@ -130,7 +131,7 @@ public class RickController : MonoBehaviour
         #region Updating Score
         if (collision.gameObject.name == "Ground_Rick" && didScore == true) {
             didScore = false;
-
+            _anim.SetBool("isjumping", false);
             //using EzMsg / shorthand form
             scoreMgr.Send<IScore>(_ => _.AddToScore());
         }
@@ -141,7 +142,7 @@ public class RickController : MonoBehaviour
         {
             if (collision.gameObject.tag == "rock") {
                 if (health == 1) {
-                    GameSceneManager.LoadLevel(4);
+                    StartCoroutine(Death());
                 }
                 else {
                     source.PlayOneShot(hit);
@@ -160,4 +161,11 @@ public class RickController : MonoBehaviour
         _rb.AddForce(Vector2.up * JumpForce);
 	}
     #endregion
+   public IEnumerator Death ()
+    {
+        _anim.SetTrigger("isdead");
+        yield return new WaitForSeconds(2f);
+        GameSceneManager.LoadLevel(4);
+    }
 }
+
